@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#2a2150" />
+    <title>Мини-Битва — Большой маленький мир</title>
+    <meta name="description" content="Мультяшная королевская битва: 10 героев размером с ладонь сражаются на кухонном столе, в саду, детской и ванной." />
+    <link rel="icon" href="icon-48.png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="icon-180.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <section id="heroLoading" class="heroLoading" role="status" aria-live="polite">
+      <div><div class="eyebrow">МИНИ-БИТВА</div><h2 data-i18n="load.title">Герои собираются</h2><p id="heroLoadingText">Загружаем 10 героев и готовим арену…</p><div id="heroLoadingRow" class="loadRow"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="loadTrack"><i id="heroLoadingBar"></i></div><p id="heroLoadingTip" class="loadTip"></p><button id="heroLoadingRetry" class="primary" hidden>Повторить</button></div>
+    </section>
+    <canvas id="world" aria-label="Трёхмерная игровая арена" data-i18n-aria="aria.world"></canvas>
+    <div id="vignette"></div>
+    <div id="hurt"></div>
+    <header>
+      <div class="brand" data-i18n-html="brand">МИНИ<span>БИТВА</span><small>БОЛЬШОЙ МАЛЕНЬКИЙ МИР</small></div>
+      <div id="matchStats" hidden><b id="alive">10</b><span id="aliveLabel" data-i18n="hud.alive">в игре</span><i></i><b id="timer">03:00</b><span id="phase">Десант</span></div>
+      <div id="eventChip" hidden></div>
+      <div id="kothBar" hidden><small data-i18n="koth.title">КОРОЛЬ ГОРЫ · ДО 100</small><div id="kothScores"></div></div>
+      <div class="headerActions">
+        <button id="langBtn" class="icon lang" aria-label="Язык · Language" title="Язык · Language" data-i18n-aria="aria.lang" data-i18n-title="aria.lang">EN</button
+        ><button id="fullscreen" class="icon" aria-label="Полный экран" title="Полный экран" data-i18n-aria="aria.fullscreen" data-i18n-title="aria.fullscreen">⛶</button
+        ><button id="pauseBtn" class="icon" hidden aria-label="Пауза" data-i18n-aria="aria.pause">Ⅱ</button
+        ><button id="settingsBtn" class="icon" aria-label="Настройки" data-i18n-aria="aria.settings">⚙</button><button
+          id="quitBtn"
+          class="icon"
+          hidden
+          aria-label="Выйти из игры"
+          title="Выйти из игры"
+          data-i18n-aria="aria.quit"
+          data-i18n-title="aria.quit"
+        >
+          ⏻
+        </button>
+      </div>
+    </header>
+    <main id="menu" class="menu">
+      <section class="intro">
+        <div class="eyebrow"><span class="liveDot"></span> <span data-i18n="menu.eyebrow">10 ГЕРОЕВ. ОДИН ПОБЕДИТЕЛЬ.</span></div>
+        <h1 data-i18n-html="menu.title">Маленький ты.<br /><em>Большая битва.</em></h1>
+        <p data-i18n-html="menu.lead">Переверни привычный мир.<br />Собери оружие из мелочей и забери корону.</p>
+        <div class="arenaSelector">
+          <button class="arenaCard selected" data-arena="kitchen">
+            <span class="arenaNumber">01</span><b data-arena-name="kitchen">Кухонный стол</b><small data-i18n="arena.kitchen.card">Посуда, крошки и горячий пар</small></button
+          ><button class="arenaCard" data-arena="garden"><span class="arenaNumber">02</span><b data-arena-name="garden">Сад великанов</b><small data-i18n="arena.garden.card">Трава, камни и поливалка</small></button
+          ><button class="arenaCard" data-arena="kidsroom">
+            <span class="arenaNumber">03</span><b data-arena-name="kidsroom">Детская</b><small data-i18n="arena.kidsroom.card">Кубики, игрушки и робот-пылесос</small>
+          </button
+          ><button class="arenaCard" data-arena="bathroom">
+            <span class="arenaNumber">04</span><b data-arena-name="bathroom">Ванная</b><small data-i18n="arena.bathroom.card">Уточки, мыло и водоворот слива</small>
+          </button>
+        </div>
+        <div class="matchOptions">
+          <label
+            ><span data-i18n="opt.duration">ДЛИТЕЛЬНОСТЬ</span><select id="duration">
+              <option value="180" data-i18n="opt.quick">Быстрый · 3 минуты</option>
+              <option value="540" data-i18n="opt.classic">Классический · 9 минут</option>
+            </select></label
+          ><label
+            ><span data-i18n="opt.rivals">СОПЕРНИКИ</span><select id="difficulty">
+              <option value="easy" data-i18n="opt.easy">Знакомство</option>
+              <option value="normal" selected data-i18n="opt.normal">Обычные</option>
+              <option value="hard" data-i18n="opt.hard">Опытные</option>
+            </select></label
+          ><label
+            ><span data-i18n="opt.mode">РЕЖИМ</span><select id="teamMode">
+              <option value="solo" selected data-i18n="opt.solo">Соло · сам за себя</option>
+              <option value="duo" data-i18n="opt.duo">Дуэты · по двое</option>
+              <option value="koth" data-i18n="opt.koth">Король горы · держи круг</option>
+            </select></label
+          >
+        </div>
+        <div class="customize">
+          <div>
+            <span class="eyebrow" data-i18n="menu.hero">ТВОЙ ГЕРОЙ</span> <button id="wardrobeBtn2" class="miniLink" data-i18n="menu.wardrobeLink">Гардероб →</button
+            ><button id="achBtn2" class="miniLink narrowOnly" data-i18n="menu.achLink">Задания и достижения →</button
+            ><button id="shopBtn2" class="miniLink narrowOnly" data-i18n="menu.shopLink">Магазин →</button>
+            <div id="swatches" aria-label="Выбор героя" data-i18n-aria="aria.heroColor"></div>
+          </div>
+          <label class="dayToggle"><input type="checkbox" id="night" /> <span data-i18n="menu.night">Ночная арена</span></label>
+        </div>
+        <div class="startRow">
+          <button id="start" class="primary" data-i18n-html="menu.start">В БИТВУ <span>↗</span></button
+          ><button id="onlineBtn" class="primary alt" data-i18n-html="net.play">С ДРУЗЬЯМИ <span>🌐</span></button>
+        </div>
+        <div id="best" class="best"></div>
+        <div id="smallScreen" class="smallScreen" data-i18n="menu.smallScreen">Для игры нужны клавиатура и мышь. Разверни окно для удобного обзора.</div>
+      </section>
+      <aside class="sidePanel">
+        <div id="lobbyPanel" hidden>
+          <div class="panelLabel"><span data-i18n="net.lobby">ЛОББИ</span> <small id="lobbyCode"></small></div>
+          <div id="lobbyMembers" class="lobbyMembers"></div>
+          <div class="panelButtons">
+            <button id="lobbyInvite" class="chip"><span>✉</span> <span data-i18n="net.invite">Позвать</span></button
+            ><button id="lobbyLeave" class="chip"><span>✕</span> <span data-i18n="net.leave">Выйти</span></button>
+          </div>
+          <div id="lobbyNote" class="panelNote"></div>
+        </div>
+        <div class="profile">
+          <div class="profileIcon">✦</div>
+          <div>
+            <small data-i18n="side.story">ТВОЯ ИСТОРИЯ</small><b id="level">Юный искатель · 1 ур.</b>
+            <div class="xpTrack"><i id="xpBar"></i></div>
+            <span id="xpText">0 / 300 опыта</span>
+          </div>
+        </div>
+        <div class="progressRow">
+          <button id="passBtn" class="progressChip"><span>★</span><div><small data-i18n="side.pass">СЕЗОН 1</small><b id="passStep">0 / 30</b><i class="progressTrack"><em id="passBar"></em></i></div></button
+          ><div class="progressChip league"><span id="leagueIcon">🥉</span><div><small id="leagueLabel">ЛИГА</small><b id="leagueName">Бронза</b><i class="progressTrack"><em id="leagueBar"></em></i></div></div>
+        </div>
+        <div class="panelLabel" id="dailyHead"><span data-i18n="side.daily">ЗАДАНИЯ ДНЯ</span> <small id="dailyLeft"></small></div>
+        <div id="daily"></div>
+        <div class="panelButtons">
+          <button id="achBtn" class="chip"><span>🏆</span> <span data-i18n="side.ach">Достижения</span> <b id="achCount">0 / 35</b></button
+          ><button id="wardrobeBtn" class="chip"><span>🎩</span> <span data-i18n="side.wardrobe">Гардероб</span></button
+          ><button id="shopBtn" class="chip shopChip"><span>🛍</span> <span data-i18n="side.shop">Магазин</span> <b id="coinCount">0</b></button>
+        </div>
+        <div class="panelNote" data-i18n-html="side.note">Никаких боевых бонусов за уровень.<br />Побеждают ловкость и смекалка.</div>
+        <button id="helpBtn" class="textButton" data-i18n="side.help">Управление и советы →</button>
+      </aside>
+    </main>
+    <div id="hud" hidden>
+      <div id="notice" role="status"></div>
+      <div id="eventBar"></div>
+      <div id="feed"></div>
+      <canvas id="map" width="180" height="180" aria-label="Карта арены" data-i18n-aria="aria.map"></canvas>
+      <div id="mapLabel"></div>
+      <div id="reticle"><i></i><b></b></div>
+      <div id="hitmark">×</div>
+      <div id="koBanner" class="koBanner" hidden aria-live="polite"><b></b><small></small></div>
+      <div id="emoteBubbles" aria-hidden="true"></div>
+      <div id="emoteWheel" class="emoteWheel" hidden>
+        <div id="emoteRing" class="emoteRing"></div>
+        <div class="emoteCenter"><b data-i18n="emote.title">ЭМОЦИИ</b><small data-i18n="emote.hint">Мышь или цифра · T — закрыть</small></div>
+      </div>
+      <div id="damageDirs" aria-hidden="true"></div>
+      <div id="numbers"></div>
+      <div id="nameplates"></div>
+      <div id="interact"></div>
+      <div id="useProgress">
+        <div></div>
+        <span></span>
+      </div>
+      <div id="downBox" hidden>
+        <b data-i18n="hud.downTitle">ТЕБЯ СБИЛИ</b>
+        <div class="downBar"><i id="downBar"></i></div>
+        <span id="downText"></span>
+      </div>
+      <div class="bottom">
+        <section class="health">
+          <div><b data-i18n="hud.you">ТЫ</b><span id="kills">0 выбываний</span></div>
+          <div class="bar"><i id="hpbar"></i><b id="hp">100</b></div>
+          <div class="armor"><i id="armorbar"></i></div>
+          <small id="armorLabel">БРОНЯ 0 / 75</small>
+          <div id="mateBox" hidden>
+            <div class="mateTop"><b data-i18n="hud.mate">НАПАРНИК</b><span id="mateName"></span><em id="mateState"></em></div>
+            <div class="mateBar"><i id="mateHp"></i></div>
+            <div class="mateArmor"><i id="mateArmor"></i></div>
+          </div>
+        </section>
+        <div id="inventory"></div>
+        <section class="supplies"><b id="meds"></b><span id="grenades"></span><span id="gadget"></span><small id="dodge"></small></section>
+      </div>
+      <div id="tip" hidden></div>
+      <div id="tutorial" hidden><small id="tutStep"></small><b id="tutText"></b><span id="tutKeys"></span><div id="tutDots"></div></div>
+      <div id="hint" class="hint">МЫШЬ — обзор · E — подобрать · 1 / 2 — оружие · Q — расходник · F — хлопушка · G — гаджет · T — эмоции</div>
+    </div>
+    <div id="spectate" hidden>
+      <small id="specTag">НАБЛЮДЕНИЕ</small>
+      <div class="specRow">
+        <button id="specPrev" class="icon" aria-label="Предыдущий герой" data-i18n-aria="aria.prevHero">◀</button><b id="specName"></b
+        ><button id="specNext" class="icon" aria-label="Следующий герой" data-i18n-aria="aria.nextHero">▶</button>
+      </div>
+      <span id="specInfo"></span>
+      <div class="specBar"><i id="specHp"></i></div>
+      <div class="specArmor"><i id="specArmor"></i></div>
+      <button id="specResult" class="primary" data-i18n-html="spec.results">ИТОГИ МАТЧА <span>→</span></button>
+      <div id="specHint" class="specHint" data-i18n="spec.hint">← → — сменить героя · ENTER — итоги · ESC — пауза</div>
+    </div>
+    <div id="toasts" aria-live="polite"></div>
+    <section id="pause" class="modal" hidden>
+      <div class="dialog">
+        <div class="eyebrow" data-i18n="pause.eyebrow">МИР ПОДОЖДЁТ</div>
+        <h2 data-i18n="pause.title">Перерыв на чай.</h2>
+        <p id="pauseText" data-i18n="pause.text">Матч на паузе. Все герои тоже отдыхают.</p>
+        <button id="resume" class="primary" data-i18n-html="pause.resume">ПРОДОЛЖИТЬ <span>→</span></button><button id="pauseSettings" class="secondary" data-i18n="pause.settings">Настройки</button
+        ><button id="skipTutorial" class="textButton" data-i18n="tut.skip" hidden>Пропустить обучение</button
+        ><button id="leave" class="textButton" data-i18n="pause.leave">Вернуться в меню</button>
+      </div>
+    </section>
+    <section id="settings" class="modal" hidden>
+      <div class="dialog">
+        <div class="eyebrow" data-i18n="set.eyebrow">ПОД СЕБЯ</div>
+        <h2 data-i18n="set.title">Настройки</h2>
+        <div class="settingsGrid">
+          <label class="setting"><span data-i18n="set.volume">Звуки</span> <input id="volume" type="range" min="0" max="100" value="55" /></label>
+          <label class="setting"><span data-i18n="set.music">Музыка</span> <input id="music" type="range" min="0" max="100" value="50" /></label>
+          <label class="setting"><span data-i18n="set.sens">Скорость камеры</span> <input id="sensitivity" type="range" min="30" max="180" value="85" /></label>
+          <label class="setting"><span data-i18n="set.aimSens">Камера при прицеливании</span> <input id="aimSens" type="range" min="30" max="100" value="70" /></label>
+          <label class="setting"><span data-i18n="set.fov">Поле зрения</span> <b id="fovValue">62°</b><input id="fov" type="range" min="55" max="80" value="62" /></label>
+          <label class="setting"
+            ><span data-i18n="set.quality">Качество графики</span><select id="quality">
+              <option value="low" data-i18n="q.low">Экономное</option>
+              <option value="high" data-i18n="q.high">Высокое</option>
+              <option value="ultra" selected data-i18n="q.ultra">Ультра</option>
+            </select></label
+          ><label class="setting"
+            ><span data-i18n="set.lang">Язык · Language</span><select id="lang">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+            </select></label
+          >
+        </div>
+        <label class="setting check"><input type="checkbox" id="autoQuality" checked /> <span data-i18n="set.auto">Снижать качество, если игра тормозит</span></label>
+        <label class="setting check"><input type="checkbox" id="invertY" /> <span data-i18n="set.invert">Инвертировать вертикаль обзора</span></label>
+        <label class="setting check"><input type="checkbox" id="shake" checked /> <span data-i18n="set.shake">Движение камеры при попаданиях</span></label>
+        <label class="setting check"><input type="checkbox" id="tips" checked /> <span data-i18n="set.tips">Подсказки для новичков</span></label>
+        <a id="privacyLink" class="miniLink" href="privacy.html" target="_blank" rel="noopener" data-i18n="set.privacy" hidden>Политика конфиденциальности</a>
+        <button id="closeSettings" class="primary" data-i18n-html="btn.done">ГОТОВО <span>✓</span></button>
+      </div>
+    </section>
+    <section id="help" class="modal" hidden>
+      <div class="dialog wide">
+        <div class="eyebrow" data-i18n="help.eyebrow">МАЛЕНЬКИЙ ПУТЕВОДИТЕЛЬ</div>
+        <h2 data-i18n="help.title">Выживает самый находчивый.</h2>
+        <div class="helpGrid">
+          <p data-i18n-html="help.1"><b>01 · Собирай</b>Подходи к светящимся припасам и нажимай E. Оружие заменяет активный слот. Цвет означает качество.</p>
+          <p data-i18n-html="help.2"><b>02 · Двигайся</b>Укрытия останавливают снаряды. Перекат даёт короткую неуязвимость. Прыгай через низкие препятствия.</p>
+          <p data-i18n-html="help.3"><b>03 · Следи за кругом</b>За границей безопасной зоны наносится урон. В середине матча прилетает золотая посылка.</p>
+          <p data-i18n-html="help.4"><b>04 · Будь изобретательным</b>G активирует подобранный гаджет. Q использует расходник, X выбирает другой. Во время лечения нельзя атаковать.</p>
+        </div>
+        <div class="controlsGrid">
+          <div>
+            <div class="panelLabel" data-i18n="help.kb">КЛАВИАТУРА И МЫШЬ</div>
+            <div class="controlRow"><kbd>W A S D</kbd><span data-i18n="ctl.move">Двигаться</span></div>
+            <div class="controlRow"><kbd data-i18n="key.mouse">МЫШЬ / ЛКМ</kbd><span data-i18n="ctl.look">Обзор / атака</span></div>
+            <div class="controlRow"><kbd data-i18n="key.rmb">ПКМ / КОЛЕСО</kbd><span data-i18n="ctl.aim">Прицел / камера</span></div>
+            <div class="controlRow"><kbd>SPACE / SHIFT</kbd><span data-i18n="ctl.jump">Прыжок / перекат</span></div>
+            <div class="controlRow"><kbd>E / 1 / 2</kbd><span data-i18n="ctl.pick">Подобрать / оружие</span></div>
+            <div class="controlRow"><kbd>Q / X</kbd><span data-i18n="ctl.heal">Лечение / выбор</span></div>
+            <div class="controlRow"><kbd>F / G</kbd><span data-i18n="ctl.gear">Хлопушка / гаджет</span></div>
+            <div class="controlRow"><kbd>R / ESC</kbd><span data-i18n="ctl.reload">Зарядить / пауза</span></div>
+            <div class="controlRow"><kbd>T</kbd><span data-i18n="ctl.emote">Эмоции</span></div>
+          </div>
+          <div>
+            <div class="panelLabel" data-i18n="help.pad">ГЕЙМПАД</div>
+            <div class="controlRow"><kbd data-i18n="key.sticks">L-СТИК / R-СТИК</kbd><span data-i18n="ctl.run">Бег / обзор</span></div>
+            <div class="controlRow"><kbd>RT / LT</kbd><span data-i18n="ctl.attack">Атака / прицел</span></div>
+            <div class="controlRow"><kbd>A / B</kbd><span data-i18n="ctl.jump">Прыжок / перекат</span></div>
+            <div class="controlRow"><kbd>X</kbd><span data-i18n="ctl.padPick">Подобрать или зарядить</span></div>
+            <div class="controlRow"><kbd>Y</kbd><span data-i18n="ctl.swap">Сменить оружие</span></div>
+            <div class="controlRow"><kbd>LB / RB</kbd><span data-i18n="ctl.gear">Хлопушка / гаджет</span></div>
+            <div class="controlRow"><kbd>↑ / ← →</kbd><span data-i18n="ctl.heal">Лечение / выбор</span></div>
+            <div class="controlRow"><kbd>START</kbd><span data-i18n="ctl.start">Пауза, старт матча</span></div>
+            <div class="controlRow"><kbd>VIEW</kbd><span data-i18n="ctl.emote">Эмоции</span></div>
+          </div>
+        </div>
+        <p class="muted" data-i18n="help.more">
+          Обзор мышью работает без зажатых кнопок. Без захвата у края экрана поворот продолжается; верни мышь к середине, чтобы остановиться. Лечение прерывается попаданием, но не уроном зоны. Кот слышит выстрелы — его
+          прыжок отмечается красным кругом. Перед паром чайника, поливом, уборкой пылесоса и водоворотом слива появляется предупреждение; мыльные
+          пузыри подбрасывают и прерывают лечение, а на мыле не устоять. После выбывания можно
+          досмотреть матч: стрелки переключают героя, Enter открывает итоги. В «Дуэтах» напарник отмечен зелёным, своих ранить нельзя, сбитого
+          напарника можно поднять (E рядом с ним), а победа команды — победа обоих.
+        </p>
+        <button id="closeHelp" class="primary" data-i18n-html="help.ready">Я ГОТОВ <span>→</span></button>
+      </div>
+    </section>
+    <section id="result" class="modal" hidden>
+      <div class="dialog resultDialog">
+        <div class="eyebrow" id="resultTag"></div>
+        <div id="resultCrown">♛</div>
+        <h2 id="resultTitle"></h2>
+        <p id="resultText"></p>
+        <div id="resultStats"></div>
+        <div id="reward"></div>
+        <ul id="resultExtras" hidden></ul>
+        <button id="again" class="primary" data-i18n-html="res.again">ЕЩЁ ОДНА БИТВА <span>↗</span></button><button id="home" class="textButton" data-i18n="res.home">В главное меню</button>
+      </div>
+    </section>
+    <section id="wardrobe" class="modal side" hidden>
+      <div class="dialog">
+        <div class="eyebrow" data-i18n="ward.eyebrow">ГАРДЕРОБ ГЕРОЯ</div>
+        <h2 data-i18n="ward.title">Наряжайся.</h2>
+        <div class="wardLabel" data-i18n="ward.color">ВЫБЕРИ ГЕРОЯ</div>
+        <div id="wardSkins" class="wardGrid"></div>
+        <div hidden><div id="wardHats"></div><div id="wardPaints"></div></div>
+        <p class="muted" data-i18n="ward.note">Внешний вид не влияет на бой. Новые вещи открываются с уровнем и за достижения.</p>
+        <button id="closeWardrobe" class="primary" data-i18n-html="btn.done">ГОТОВО <span>✓</span></button>
+      </div>
+    </section>
+    <section id="online" class="modal" hidden>
+      <div class="dialog">
+        <div class="eyebrow" data-i18n="net.eyebrow">ИГРА ПО СЕТИ</div>
+        <h2 data-i18n="net.title">Битва с друзьями.</h2>
+        <p data-i18n="net.lead">До 10 героев в одном лобби. Свободные места займут боты.</p>
+        <p id="netStatus" class="muted"></p>
+        <p id="netPrivacy" class="muted small" data-i18n-html="net.privacy" hidden></p>
+        <div id="netHome">
+          <button id="netCreate" class="primary" data-i18n-html="net.create">СОЗДАТЬ ЛОББИ <span>＋</span></button>
+          <label class="setting check"><input type="checkbox" id="netPublic" checked /> <span data-i18n="net.public">Открытое лобби — может зайти любой</span></label>
+          <div class="panelLabel"><span data-i18n="net.lobbies">ОТКРЫТЫЕ ЛОББИ</span> <button id="netRefresh" class="miniLink" data-i18n="net.refresh">Обновить</button></div>
+          <div id="netList" class="netList"></div>
+          <div class="panelLabel" data-i18n="net.codeLabel">ВОЙТИ ПО КОДУ</div>
+          <div class="netCode">
+            <input id="netCodeInput" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Код лобби" data-i18n-ph="net.codePh" /><button
+              id="netJoinCode"
+              class="secondary"
+              data-i18n="net.join"
+            >
+              Войти
+            </button>
+          </div>
+        </div>
+        <button id="closeOnline" class="textButton" data-i18n="net.close">Закрыть</button>
+      </div>
+    </section>
+    <section id="season" class="modal side" hidden>
+      <div class="dialog seasonDialog">
+        <div class="eyebrow" data-i18n="pass.eyebrow">СЕЗОН 1 · БЕСПЛАТНО</div>
+        <h2 data-i18n="pass.title">Большой переполох.</h2>
+        <p class="seasonLead"><b id="seasonStars"></b> <span data-i18n="pass.lead">Звёзды дают за каждый матч, места, выбывания и задания дня. Каждые 4 звезды — новая ступень и подарок.</span></p>
+        <div id="seasonGrid" class="seasonGrid"></div>
+        <div class="eyebrow" data-i18n="pass.league">ЛИГА</div>
+        <div id="seasonLeague" class="seasonLeague"></div>
+        <p class="seasonLead small" data-i18n="pass.leagueLead">Очки лиги дают за места и выбывания и снимают за ранний вылет.</p>
+        <button id="closeSeason" class="primary" data-i18n-html="btn.done">ГОТОВО <span>✓</span></button>
+      </div>
+    </section>
+    <section id="shop" class="modal side" hidden>
+      <div class="dialog shopDialog">
+        <div class="eyebrow" data-i18n="shop.eyebrow">МАГАЗИН</div>
+        <h2 data-i18n="shop.title">Только за монеты.</h2>
+        <div class="coinBalance"><i class="coin"></i><b id="shopCoins">0</b><small data-i18n="shop.lead">Монеты дают за матчи, выбывания, победы, задания и достижения. Всё здесь — только для красоты.</small></div>
+        <div class="shopTabs" id="shopTabs">
+          <button data-tab="daily" class="on" data-i18n="shop.daily">ВИТРИНА ДНЯ</button
+          ><button data-tab="emote" data-i18n="shop.emotes">ЭМОЦИИ</button
+          ><button data-tab="dance" data-i18n="shop.dances">ТАНЦЫ ПОБЕДЫ</button
+          ><button data-tab="trail" data-i18n="shop.trails">СЛЕДЫ</button>
+        </div>
+        <div id="shopNote" class="shopNote"></div>
+        <div id="shopGrid" class="shopGrid"></div>
+        <button id="closeShop" class="primary" data-i18n-html="btn.done">ГОТОВО <span>✓</span></button>
+      </div>
+    </section>
+    <section id="achievements" class="modal" hidden>
+      <div class="dialog wide">
+        <div class="eyebrow" data-i18n="ach.eyebrow">ДОСТИЖЕНИЯ</div>
+        <h2 id="achTitle">Полка для кубков.</h2>
+        <div class="panelLabel" data-i18n="side.daily">ЗАДАНИЯ ДНЯ</div>
+        <div id="achDaily" class="dailyList"></div>
+        <div class="panelLabel" data-i18n="ach.eyebrow">ДОСТИЖЕНИЯ</div>
+        <div id="achGrid" class="achGrid"></div>
+        <button id="closeAch" class="primary" data-i18n-html="btn.close">ЗАКРЫТЬ <span>✓</span></button>
+      </div>
+    </section>
+    <div id="padHint" class="padHint" data-i18n="pad.hint">✚ — выбрать · Ⓐ — нажать · Ⓑ — назад · ◀ ▶ — изменить · LB RB — арена · START — в бой</div>
+    <div id="fatal" class="modal" hidden>
+      <div class="dialog">
+        <h2 data-i18n="fatal.title">Нужен WebGL</h2>
+        <p id="fatalText" data-i18n="fatal.text">Открой игру в браузере с включённым аппаратным ускорением.</p>
+      </div>
+    </div>
+    <script src="lang.js"></script>
+    <script src="three.js"></script>
+    <script src="config.js"></script>
+    <script src="heroes.js"></script>
+    <script src="hero-animation.js"></script>
+    <script src="engine.js"></script>
+    <script src="game.js"></script>
+    <script src="net.js"></script>
+    <script src="pwa.js"></script>
+  </body>
+</html>
