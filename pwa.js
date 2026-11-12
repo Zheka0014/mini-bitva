@@ -1,7 +1,9 @@
 "use strict";
 // Web and Microsoft Store version: the service worker (sw.js) keeps the game for offline play and fetches updates.
+// (start.js may load this file after the page has finished loading, so it doesn't wait for "load" then.)
 if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
-  window.addEventListener("load", () => {
+  const whenLoaded = (f) => (document.readyState === "complete" ? f() : window.addEventListener("load", f));
+  whenLoaded(() => {
     navigator.serviceWorker
       .register("sw.js")
       .then((reg) => {

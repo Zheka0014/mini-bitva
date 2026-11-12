@@ -288,6 +288,7 @@ const N = {
   cfg: null,
   lastKa: 0,
   lastPoll: 0,
+  startT: 0,
 };
 const nowS = () => performance.now() / 1000;
 const actBit = (name) => 1 << ACTS.indexOf(name);
@@ -531,6 +532,7 @@ net.hostFrame = (realDt) => {
 
 // ----- client -----
 function clientStart(msg) {
+  N.startT = nowS();
   // Set before the heroes are made: in duos their teams come from their ids.
   Object.assign(options, { arena: msg.o.arena, duration: msg.o.duration, difficulty: msg.o.difficulty, night: !!msg.o.night, mode: ["duo", "koth"].includes(msg.o.mode) ? msg.o.mode : "solo" });
   mirrorCfg(msg.o);
@@ -968,7 +970,8 @@ net.poll = () => {
   }
   if (N.role === "host") {
     for (const m of [...N.members]) if (now - m.seen > 10) dropMember(m);
-  } else if (now - N.seen > 10) hostLost();
+    // The first seconds of a match can freeze a slow host's page while it prepares the arena: wait longer then.
+  } else if (now - N.seen > (now - (N.startT || 0) < 60 ? 40 : 10)) hostLost();
 };
 // Background pump: if the page stops drawing (hidden window), the host's world and a client's input keep going.
 setInterval(() => {

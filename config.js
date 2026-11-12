@@ -7,4 +7,8 @@ window.MiniConfig = {
   // Optional relay (TURN) servers for players whose networks block direct connections, for example:
   // [{ urls: "turn:turn.example.com:3478", username: "name", credential: "password" }]
   iceServers: [],
+  // The game is sold in the Microsoft Store: true lets it run only when started from the Store app (see start.js);
+  // false makes the website a free browser version again.
+  storeOnly: true,
+  storeUrl: "https://apps.microsoft.com/detail/9PJGQPHW6MKQ",
 };
