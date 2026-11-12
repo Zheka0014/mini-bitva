@@ -2,8 +2,8 @@
 // Mini Bitva service worker: the game works offline after the first start.
 // The game files are saved at install; hero models (.glb, ~40 MB) right after the game first loads them.
 // Each build writes its own VERSION, so a new upload replaces the saved game files.
-const VERSION = "375bc0553553",
-  CORE = ["./", "config.js", "engine.js", "game.js", "hero-animation.js", "heroes.js", "icon-128.png", "icon-144.png", "icon-152.png", "icon-180.png", "icon-192.png", "icon-256.png", "icon-384.png", "icon-48.png", "icon-512.png", "icon-72.png", "icon-96.png", "icon-maskable-192.png", "icon-maskable-512.png", "index.html", "lang.js", "manifest.webmanifest", "net.js", "privacy.html", "pwa.js", "style.css", "three-LICENSE.txt", "three.js"],
+const VERSION = "d7c2a5f04108",
+  CORE = ["./", "config.js", "credits.txt", "engine.js", "game.js", "hero-animation.js", "heroes.js", "icon-128.png", "icon-144.png", "icon-152.png", "icon-180.png", "icon-192.png", "icon-256.png", "icon-384.png", "icon-48.png", "icon-512.png", "icon-72.png", "icon-96.png", "icon-maskable-192.png", "icon-maskable-512.png", "index.html", "lang.js", "manifest.webmanifest", "net.js", "privacy.html", "pwa.js", "style.css", "three.js"],
   CORE_CACHE = "mb-core-" + VERSION,
   HEROES = ["hero-01.glb", "hero-02.glb", "hero-03.glb", "hero-04.glb", "hero-05.glb", "hero-06.glb", "hero-07.glb", "hero-08.glb", "hero-09.glb", "hero-10.glb"],
   HERO_CACHE = "mb-heroes-f65d8a869e";
