@@ -1,3 +1,5 @@
+Mini Bitva uses three.js (https://threejs.org), which comes with this license:
+
 The MIT License
 
 Copyright © 2010-2024 three.js authors
