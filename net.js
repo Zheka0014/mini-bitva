@@ -1330,7 +1330,7 @@ function webTransport() {
     const s = { token: t.EntityToken, me: { Id: t.Entity.Id, Type: t.Entity.Type || "title_player_account" }, until: (Date.parse(t.TokenExpiration) || Date.now() + 36e5) - 6e5 };
     // A lobby left behind by a closed tab would still count this player in it: leave those first.
     try {
-      const old = await raw("/Lobby/FindLobbies", { Filter: "lobby/amMember eq true" }, s.token);
+      const old = await raw("/Lobby/FindLobbies", { Filter: "lobby/amMember eq 'true'" }, s.token);
       await Promise.all((old.Lobbies || []).map((l) => raw("/Lobby/LeaveLobby", { LobbyId: l.LobbyId, MemberEntity: s.me }, s.token).catch(() => {})));
     } catch {}
     return (session = s);
